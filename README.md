@@ -2,8 +2,6 @@
 Android Remote Access Trojan Binder
 
 [![Unk9vvN](https://img.shields.io/badge/Unk9vvN-AndTroj-green.svg)](https://github.com/unk9vvn/AndTroj)
-[![GitHub release](https://img.shields.io/badge/Last-Realase-green.svg)](https://github.com/unk9vvn/AndTroj/releases)
-[![GitHub updated](https://img.shields.io/badge/build-version-yellow.svg)](https://github.com/unk9vvn/AndTroj/blob/master/others/version)
 [![License MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/unk9vvn/AndTroj/blob/master/LICENSE)
 [![License MIT](https://img.shields.io/badge/telegram-channel-orange.svg)](https://t.me/Unk9vvN)
 [![Follow on Twitter](https://img.shields.io/twitter/follow/espadrine.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=unk9vvn)
