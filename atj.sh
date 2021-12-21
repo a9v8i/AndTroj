@@ -1,5 +1,5 @@
 #!/bin/zsh
-# v108
+# v55
 # ┌──(unk9vvn㉿avi)-[~]
 # └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $NoIP $APK $URL
 
