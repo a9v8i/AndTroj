@@ -37,7 +37,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 
 
 # Install Tools
-if [[ ! -f "/usr/bin/jarsigner" || ! -f "/usr/bin/tor" || ! -f "/usr/bin/curl" || ! -f "/usr/local/bin/apktool" || ! -f "/usr/sbin/sendmail" || ! -f "/usr/bin/proxychains" || ! -f "/usr/bin/obfs4proxy" || ! -f "/usr/bin/msfvenom" ]];then
+if [[ ! -f "/usr/bin/tor" || ! -f "/usr/bin/curl" || ! -f "/usr/local/bin/apktool" || ! -f "/usr/sbin/sendmail" || ! -f "/usr/bin/proxychains" || ! -f "/usr/bin/obfs4proxy" || ! -f "/usr/bin/msfvenom" ]];then
 	echo -e "$GREEN [*]$YELLOW Install TOR $YELLOW"
 	echo -e "$GREEN [*]$YELLOW Install AAPT $YELLOW"
 	echo -e "$GREEN [*]$YELLOW Install CURL $YELLOW"
