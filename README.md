@@ -10,10 +10,10 @@ Android Remote Access Trojan Binder
 A tool for integrating the Metasploit payload with Android's healthy programs and bypassing antivirus
 
 # Features
-- :heavy_check_mark: Using custom dns for harvester phishing webpages.
+- :heavy_check_mark: Using custom dns for harvester phishing webpages (Pro Ngrok License).
 - :heavy_check_mark: Bypass 90% android Antivirus (Obfuscation Method).
 - :heavy_check_mark: Bind metasploit meterpreter payload (android) Original APKs.
-- :heavy_check_mark: Anti forensic connections in targets (using tor proxys for ngrok connections).
+- :heavy_check_mark: Anti forensic Pihshing (using tor proxys for ngrok connections).
 - :heavy_check_mark: Create automations persistence and bash backdoor for android phones.
 
 
