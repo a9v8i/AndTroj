@@ -32,6 +32,6 @@ This tool creates a tune-up of the Metasploit program, unlocks the program and i
 # ┌──(unk9vvn㉿avi)-[~]
 # └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $NoIP $Orginal-APK $Phshing-URL
 ```
-# Only support the Kali Linux operating system
+Only support the Kali Linux operating system
 
 # Website: [Unk9vvN](https://unk9vvn.com)
