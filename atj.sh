@@ -59,7 +59,7 @@ if [[ ! -f "/usr/bin/tor" || ! -f "/usr/bin/curl" || ! -f "/usr/local/bin/apktoo
 fi
 
 
-# Checking Update
+# Checking Version
 if [ "$(curl -s https://raw.githubusercontent.com/a9v8i/AndTroj/main/version)" != "$version" ]; then
 	echo -e "$GREEN [*]$YELLOW Updating new version...$YELLOW"
 	git clone https://github.com/a9v8i/AndTroj.git /tmp/AndTroj
