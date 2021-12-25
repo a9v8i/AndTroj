@@ -50,7 +50,7 @@ if [[ ! -f "/usr/bin/git" || ! -f "/usr/bin/tor" || ! -f "/usr/bin/curl" || ! -f
 	echo -e "$GREEN [*]$YELLOW Install Proxychains $YELLOW"
 	echo -e "$GREEN [*]$YELLOW Install OpenJDK 11-14 $YELLOW"
 	echo -e "$GREEN [*]$YELLOW Install Metasploit-Framework $YELLOW"
-	apt-get -qq update;apt-get install -y -qq git tor proxychains obfs4proxy curl aapt apktool default-jdk openjdk-11-jdk metasploit-framework sendemail apache2;msfdb init
+	apt-get -qq update;apt-get install -y -qq git tor proxychains zipalign obfs4proxy curl aapt apktool default-jdk openjdk-11-jdk metasploit-framework sendemail apache2;msfdb init
 
 	if [ "$(apktool -version)" != "2.6.0" ];then
 		wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.0.jar -O /usr/local/bin/apktool.jar
