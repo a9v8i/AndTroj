@@ -1,6 +1,6 @@
 #!/bin/bash
 # ┌──(avi㉿unk9vvn)-[~]
-# └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $NoIP $APK $URL
+# └─$ sudo ./AndTroj.sh example.ddns.net imo-messenger.apk https://play.google.com/store/apps/details?id=com.imo.android.imoim
 
 
 
