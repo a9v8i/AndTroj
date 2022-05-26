@@ -12,7 +12,7 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
-version="72"
+version="73"
 apktool_version="2.6.1-dirty"
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 NoIP=$1
@@ -25,6 +25,18 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | grep -v '169.*.*.*' | grep -v '192.168.56.*' | grep -v '192.168.236.*')
 
 
+# Checking Version
+if [ "$(curl -s https://raw.githubusercontent.com/a9v8i/AndTroj/main/version)" != "$version" ]; then
+	echo -e "$GREEN [*]$YELLOW Updating new version...$YELLOW"
+	git clone https://github.com/a9v8i/AndTroj.git /tmp/AndTroj
+	cp -r /tmp/AndTroj/* .
+	rm -r /tmp/AndTroj
+	echo -e "$GREEN [*]$YELLOW Updated... Please Try Again Script$YELLOW"
+	exit
+fi
+
+
+# Check Root and Args
 if [ "$(id -u)" != "0" ];then
 	echo -e "$RED [X]$YELLOW Please run as RooT ... $YELLOW"
 	echo -e "$GREEN [*]$YELLOW sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $YELLOW"
@@ -75,17 +87,6 @@ elif [[ ! -f "/usr/local/bin/ngrok" ]];then
 	apt update -qq && apt install -qq ngrok
 	read -p ""$GREEN" [*]"$YELLOW" Enter Ngrok Token: "$YELLOW"" TOKEN
 	ngrok $TOKEN
-fi
-
-
-# Checking Version
-if [ "$(curl -s https://raw.githubusercontent.com/a9v8i/AndTroj/main/version)" != "$version" ]; then
-	echo -e "$GREEN [*]$YELLOW Updating new version...$YELLOW"
-	git clone https://github.com/a9v8i/AndTroj.git /tmp/AndTroj
-	cp -r /tmp/AndTroj/* .
-	rm -r /tmp/AndTroj
-	echo -e "$GREEN [*]$YELLOW Updated... Please Try Again Script$YELLOW"
-	exit
 fi
 
 
