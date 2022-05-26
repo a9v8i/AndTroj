@@ -42,7 +42,7 @@ LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*
 # Install Tools
 if [[ ! -f "/usr/bin/git" || ! -f "/usr/bin/tor" || ! -f "/usr/bin/curl" || ! -f "/usr/local/bin/apktool" || ! -f "/usr/sbin/sendmail" || ! -f "/usr/bin/proxychains" || ! -f "/usr/bin/obfs4proxy" || ! -f "/usr/bin/msfvenom" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing Required Tools $YELLOW"
-	apt-get -qq update;apt-get install -y -qq git tor proxychains zipalign obfs4proxy curl aapt apktool default-jdk openjdk-11-jdk metasploit-framework sendemail apache2;msfdb init
+	apt-get -q update;apt-get install -y -q git tor proxychains zipalign obfs4proxy curl aapt apktool default-jdk openjdk-11-jdk metasploit-framework sendemail apache2;msfdb init
 
 	if [ "$(apktool -version)" != "$apktool_version" ];then
 		wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
