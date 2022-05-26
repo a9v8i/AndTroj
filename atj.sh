@@ -13,7 +13,7 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
-version = '65'
+version = '67'
 apktool_version = '2.6.1'
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 
