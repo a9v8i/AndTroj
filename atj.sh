@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 # v67
 # ┌──(avi㉿unk9vvn)-[~]
 # └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $NoIP $APK $URL
