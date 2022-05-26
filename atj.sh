@@ -12,7 +12,7 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
-version="67"
+version="68"
 apktool_version="2.6.1"
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 
@@ -64,6 +64,13 @@ elif [[ ! -f "/usr/bin/obfs4proxy" ]];then
 elif [[ ! -f "/usr/bin/msfvenom" ]];then
     echo -e "$GREEN [*]$YELLOW Installing msfvenom $YELLOW"
     apt-get install -y -q msfvenom
+elif [ test -f "/usr/local/bin/ngrok" ];then
+	echo -e "$GREEN [*]$YELLOW Install Ngrok $YELLOW"
+	curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null &&
+    echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list &&
+    apt update -qq && apt install -qq ngrok
+    read -p "$GREEN [*]$YELLOW Enter Ngrok Token: $YELLOW" TOKEN
+	ngrok $TOKEN
 elif [ "$(apktool -version)" != "$apktool_version" ];then
     echo -e "$GREEN [*]$YELLOW Upgrading apktool -> $apktool_version $YELLOW"
     wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
@@ -92,17 +99,6 @@ ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy managed
 Bridge obfs4 178.17.170.33:4444 C2542268C0F438A725E5225781B689A33F12C495 cert=7V57ZSaOe59/oSbHNVyQaWyvtPYmGkb4Wy+MoDOuJDoR5czdc1YfaA8cMXD/unSy4ZNoXA iat-mode=0
 Bridge obfs4 46.43.1.48:9101 B6461B4E15C02BB8578E5BEAD24D4187F086EC73 cert=hoGthy5+DAGrnL4Iaf67SBUozXf6MecVGEhhwFHNBKnhxal76lGVv2rn/E76/vaPAB3pAA iat-mode=0
 Bridge obfs4 185.177.207.13:22662 98AD30401043993AFA64D776E13E7C2AA793C589 cert=p9L6+25s8bnfkye1ZxFeAE4mAGY7DH4Gaj7dxngIIzP9BtqrHHwZXdjMK0RVIQ34C7aqZw iat-mode=2" >> /etc/tor/torrc
-fi
-
-
-# Install Ngrok
-if ! test -f "/usr/local/bin/ngrok";then
-	echo -e "$GREEN [*]$YELLOW Install Ngrok $YELLOW"
-	curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null &&
-    echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list &&
-    apt update -qq && apt install -qq ngrok
-    read -p "$GREEN [*]$YELLOW Enter Ngrok Token: $YELLOW" TOKEN
-	ngrok $TOKEN
 fi
 
 
