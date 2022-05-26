@@ -32,6 +32,7 @@ if [ "$(id -u)" != "0" ];then
 elif [ "$#" != "3" ]; then
     echo -e "$RED [X]$YELLOW You Must Provide Three Args ... $YELLOW"
     echo -e "$GREEN [*]$YELLOW sudo ./AndTroj.sh \$NoIP \$APK \$URL $YELLOW"
+    exit 0
 fi
 
 
