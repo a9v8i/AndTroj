@@ -12,7 +12,7 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
-version="68"
+version="67"
 apktool_version="2.6.1"
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 
@@ -64,18 +64,18 @@ elif [[ ! -f "/usr/bin/obfs4proxy" ]];then
 elif [[ ! -f "/usr/bin/msfvenom" ]];then
     echo -e "$GREEN [*]$YELLOW Installing msfvenom $YELLOW"
     apt-get install -y -q msfvenom
-elif [ test -f "/usr/local/bin/ngrok" ];then
-	echo -e "$GREEN [*]$YELLOW Install Ngrok $YELLOW"
-	curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null &&
-    echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list &&
-    apt update -qq && apt install -qq ngrok
-    read -p "$GREEN [*]$YELLOW Enter Ngrok Token: $YELLOW" TOKEN
-	ngrok $TOKEN
 elif [ "$(apktool -version)" != "$apktool_version" ];then
     echo -e "$GREEN [*]$YELLOW Upgrading apktool -> $apktool_version $YELLOW"
     wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
 	wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
 	chmod +x /usr/local/bin/apktool && chmod +x /usr/local/bin/apktool.jar
+elif [ test -f "/usr/local/bin/ngrok" ];then
+	echo -e "$GREEN [*]$YELLOW Install Ngrok $YELLOW"
+	curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null &&
+    echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list &&
+    apt update -qq && apt install -qq ngrok
+    read -p ""$GREEN" [*]"$YELLOW" Enter Ngrok Token: "$YELLOW"" TOKEN
+	ngrok $TOKEN
 fi
 
 
