@@ -41,16 +41,7 @@ LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*
 
 # Install Tools
 if [[ ! -f "/usr/bin/git" || ! -f "/usr/bin/tor" || ! -f "/usr/bin/curl" || ! -f "/usr/local/bin/apktool" || ! -f "/usr/sbin/sendmail" || ! -f "/usr/bin/proxychains" || ! -f "/usr/bin/obfs4proxy" || ! -f "/usr/bin/msfvenom" ]];then
-	echo -e "$GREEN [*]$YELLOW Installed Git $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Installed TOR $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Installed AAPT $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Installed CURL $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Installed APKTool $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Installed SendMail $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Installed Obfs4Proxy $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Installed Proxychains $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Installed OpenJDK 11-14 $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Installed Metasploit-Framework $YELLOW"
+	echo -e "$GREEN [*]$YELLOW Installing Required Tools $YELLOW"
 	apt-get -qq update;apt-get install -y -qq git tor proxychains zipalign obfs4proxy curl aapt apktool default-jdk openjdk-11-jdk metasploit-framework sendemail apache2;msfdb init
 
 	if [ "$(apktool -version)" != "$apktool_version" ];then
