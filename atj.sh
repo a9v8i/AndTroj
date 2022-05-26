@@ -14,6 +14,7 @@ YELLOW="\u001b[33m"
 
 
 version = '65'
+apktool_version = '2.6.1'
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 
 
@@ -52,8 +53,8 @@ if [[ ! -f "/usr/bin/git" || ! -f "/usr/bin/tor" || ! -f "/usr/bin/curl" || ! -f
 	echo -e "$GREEN [*]$YELLOW Install Metasploit-Framework $YELLOW"
 	apt-get -qq update;apt-get install -y -qq git tor proxychains zipalign obfs4proxy curl aapt apktool default-jdk openjdk-11-jdk metasploit-framework sendemail apache2;msfdb init
 
-	if [ "$(apktool -version)" != "2.6.0" ];then
-		wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.0.jar -O /usr/local/bin/apktool.jar
+	if [ "$(apktool -version)" != "$apktool_version" ];then
+		wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
 		wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
 		chmod +x /usr/local/bin/apktool && chmod +x /usr/local/bin/apktool.jar
 	fi
@@ -76,9 +77,10 @@ if [ "$TORRC" != "UseBridges 1" ]; then
 	echo "
 UseBridges 1
 ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy managed
-Bridge obfs4 194.135.89.28:443 7E3C52E04355F0D925B5F493BEFB97D419B70D80 cert=B+XjD3L80HvQLjm/Rw+D5RRSsCjlO0jW9WvA4NR7ADPE4zXyPpp5jN2RgeRDuIas1xG1PA iat-mode=0
-Bridge obfs4 103.246.250.213:8042 30BBC628BAF0E1C6E5780A90B2954C9EF9A9792C cert=HUphhCSe3K+UQf1a4z7JB0jXpjIPQGEBIvyk2zwGoPMB/05qBrk8pY4CRSNfviRadyTyHQ iat-mode=0
-Bridge obfs4 185.162.248.147:10111 7207F204CC4E242688FFA252599E51DDA776C01D cert=e3LSXtFXpmAP5pcW2UgSMwi4QaOeRiFxzXj6v9FXpD8yjjZhtcO2PDwBx+vdx4Wb5W3yTw iat-mode=0" >> /etc/tor/torrc
+
+Bridge obfs4 178.17.170.33:4444 C2542268C0F438A725E5225781B689A33F12C495 cert=7V57ZSaOe59/oSbHNVyQaWyvtPYmGkb4Wy+MoDOuJDoR5czdc1YfaA8cMXD/unSy4ZNoXA iat-mode=0
+Bridge obfs4 46.43.1.48:9101 B6461B4E15C02BB8578E5BEAD24D4187F086EC73 cert=hoGthy5+DAGrnL4Iaf67SBUozXf6MecVGEhhwFHNBKnhxal76lGVv2rn/E76/vaPAB3pAA iat-mode=0
+Bridge obfs4 185.177.207.13:22662 98AD30401043993AFA64D776E13E7C2AA793C589 cert=p9L6+25s8bnfkye1ZxFeAE4mAGY7DH4Gaj7dxngIIzP9BtqrHHwZXdjMK0RVIQ34C7aqZw iat-mode=2" >> /etc/tor/torrc
 fi
 
 
