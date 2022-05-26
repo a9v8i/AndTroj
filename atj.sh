@@ -41,40 +41,40 @@ LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*
 
 # Install Tools
 if [[ ! -f "/usr/bin/git" ]];then
-    echo -e "$GREEN [*]$YELLOW Installing git $YELLOW"
-    apt-get install -y -q git
+	echo -e "$GREEN [*]$YELLOW Installing git $YELLOW"
+	apt-get install -y -q git
 elif [[ ! -f "/usr/bin/tor" ]];then
-    echo -e "$GREEN [*]$YELLOW Installing tor $YELLOW"
-    apt-get install -y -q tor
+	echo -e "$GREEN [*]$YELLOW Installing tor $YELLOW"
+	apt-get install -y -q tor
 elif [[ ! -f "/usr/bin/curl" ]];then
-    echo -e "$GREEN [*]$YELLOW Installing curl $YELLOW"
-    apt-get install -y -q curl
+	echo -e "$GREEN [*]$YELLOW Installing curl $YELLOW"
+	apt-get install -y -q curl
 elif [[ ! -f "/usr/bin/apktool" ]];then
-    echo -e "$GREEN [*]$YELLOW Installing apktool $YELLOW"
-    apt-get install -y -q apktool
+	echo -e "$GREEN [*]$YELLOW Installing apktool $YELLOW"
+	apt-get install -y -q apktool
 elif [[ ! -f "/usr/bin/sendmail" ]];then
-    echo -e "$GREEN [*]$YELLOW Installing sendmail $YELLOW"
-    apt-get install -y -q sendmail
+	echo -e "$GREEN [*]$YELLOW Installing sendmail $YELLOW"
+	apt-get install -y -q sendmail
 elif [[ ! -f "/usr/bin/proxychains" ]];then
-    echo -e "$GREEN [*]$YELLOW Installing proxychains $YELLOW"
-    apt-get install -y -q proxychains
+	echo -e "$GREEN [*]$YELLOW Installing proxychains $YELLOW"
+	apt-get install -y -q proxychains
 elif [[ ! -f "/usr/bin/obfs4proxy" ]];then
-    echo -e "$GREEN [*]$YELLOW Installing obfs4proxy $YELLOW"
-    apt-get install -y -q obfs4proxy
+	echo -e "$GREEN [*]$YELLOW Installing obfs4proxy $YELLOW"
+	apt-get install -y -q obfs4proxy
 elif [[ ! -f "/usr/bin/msfvenom" ]];then
-    echo -e "$GREEN [*]$YELLOW Installing msfvenom $YELLOW"
-    apt-get install -y -q msfvenom
+	echo -e "$GREEN [*]$YELLOW Installing msfvenom $YELLOW"
+	apt-get install -y -q msfvenom
 elif [ "$(apktool -version)" != "$apktool_version" ];then
-    echo -e "$GREEN [*]$YELLOW Upgrading apktool -> $apktool_version $YELLOW"
-    wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
+	echo -e "$GREEN [*]$YELLOW Upgrading apktool -> $apktool_version $YELLOW"
+	wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
 	wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
 	chmod +x /usr/local/bin/apktool && chmod +x /usr/local/bin/apktool.jar
 elif [ test -f "/usr/local/bin/ngrok" ];then
 	echo -e "$GREEN [*]$YELLOW Install Ngrok $YELLOW"
 	curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null &&
-    echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list &&
-    apt update -qq && apt install -qq ngrok
-    read -p ""$GREEN" [*]"$YELLOW" Enter Ngrok Token: "$YELLOW"" TOKEN
+	echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list &&
+	apt update -qq && apt install -qq ngrok
+	read -p ""$GREEN" [*]"$YELLOW" Enter Ngrok Token: "$YELLOW"" TOKEN
 	ngrok $TOKEN
 fi
 
