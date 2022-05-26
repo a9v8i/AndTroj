@@ -12,7 +12,7 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
-version="69"
+version="70"
 apktool_version="2.6.1"
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 
@@ -52,9 +52,6 @@ elif [[ ! -f "/usr/bin/curl" ]];then
 elif [[ ! -f "/usr/bin/apktool" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing apktool $YELLOW"
 	apt-get install -y -qq apktool
-elif [[ ! -f "/usr/bin/sendmail" ]];then
-	echo -e "$GREEN [*]$YELLOW Installing sendmail $YELLOW"
-	apt-get install -y -qq sendmail
 elif [[ ! -f "/usr/bin/proxychains" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing proxychains $YELLOW"
 	apt-get install -y -qq proxychains
@@ -65,7 +62,7 @@ elif [[ ! -f "/usr/bin/msfvenom" ]];then
 	echo -e "$GREEN [*]$YELLOW Installing msfvenom $YELLOW"
 	apt-get install -y -qq msfvenom
 elif [ "$(apktool -version)" != "$apktool_version" ];then
-	echo -e "$GREEN [*]$YELLOW Upgrading apktool -> $apktool_version $YELLOW"
+	echo -e "$GREEN [*]$YELLOW Upgrading apktool to $apktool_version $YELLOW"
 	wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
 	wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
 	chmod +x /usr/local/bin/apktool && chmod +x /usr/local/bin/apktool.jar
