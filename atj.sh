@@ -13,7 +13,7 @@ YELLOW="\u001b[33m"
 
 
 version="70"
-apktool_version="2.6.1"
+apktool_version="2.6.1-dirty"
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 
 
