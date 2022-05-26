@@ -12,7 +12,7 @@ WHITE="\u001b[37m"
 YELLOW="\u001b[33m"
 
 
-version="73"
+version="74"
 apktool_version="2.6.1-dirty"
 TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
 NoIP=$1
