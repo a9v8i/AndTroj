@@ -1,5 +1,5 @@
 #!/bin/bash
-ver='1.0'
+ver='2.0'
 
 
 RED='\e[1;31m'
@@ -342,6 +342,9 @@ EOF
 		printf "$GREEN"  "[*] Successfully Updating $name"
 		bash /usr/share/$name/$name.sh
 	fi
+
+	binder
+	phishing
 }
 
 
