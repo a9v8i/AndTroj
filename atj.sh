@@ -1,5 +1,5 @@
 #!/bin/bash
-ver='2.0'
+ver='1.5'
 
 
 RED='\e[1;31m'
