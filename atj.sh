@@ -488,7 +488,7 @@ init()
         local name="andtroj"
         git clone https://github.com/a9v8i/AndTroj /usr/share/$name
         chmod 755 /usr/share/$name/*
-        cat > /usr/bin/$name << EOF
+        cat > /usr/bin/atj << EOF
 #!/bin/bash
 cd /usr/share/$name;sudo ./atj.sh "\$@"
 EOF
@@ -496,9 +496,9 @@ EOF
         success "Successfully Installed $name"
     elif [ "$(curl -s https://raw.githubusercontent.com/a9v8i/AndTroj/main/version)" != "$VER" ]; then
         local name="andtroj"
-        cd /usr/share/$tool_name && git reset --hard && git clean -fd && git pull
+        cd /usr/share/$name && git reset --hard && git clean -fd && git pull
         chmod 755 /usr/share/$name/*
-        cat > /usr/bin/$name << EOF
+        cat > /usr/bin/atj << EOF
 #!/bin/bash
 cd /usr/share/$name;sudo ./atj.sh "\$@"
 EOF
